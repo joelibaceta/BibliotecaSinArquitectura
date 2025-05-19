@@ -1,5 +1,5 @@
 
-# README - Instrucciones para la actividad de Arquitectura Modular
+# Instrucciones para la actividad
 
 ## 🔧 Reestructuración del Proyecto: Ejercicio de Arquitectura Modular
 
