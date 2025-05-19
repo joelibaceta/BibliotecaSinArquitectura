@@ -13,6 +13,18 @@ Como parte del curso, el objetivo de esta actividad es **proponer una nueva arqu
 Rediseñar la estructura del sistema para que sea más clara, escalable y fácil de mantener, 
 usando un monolito con una arquitectura modular.
 
+### 🧠 Lógica actual del sistema
+
+- **Estudiantes** pueden tomar prestados hasta **3 libros** simultáneamente.
+- **Profesores** pueden tomar hasta **5 libros**.
+- La clase `Library` administra los préstamos y verifica si el usuario aún puede tomar otro libro.
+- No hay una separación clara de responsabilidades (por ejemplo, las reglas de préstamo están embebidas en la lógica general).
+- Tampoco hay una estructura modular del sistema que permita escalarlo fácilmente o mantenerlo en el tiempo.
+
+Este proyecto fue construido sin aplicar principios de arquitectura, y servirá como punto de partida para repensar su diseño organizacional.
+
+---
+
 ## 📐 Formas de entrega según tu perfil
 
 Hay **dos formas de entregar esta actividad**, dependiendo de tu nivel de familiaridad con la programación:
