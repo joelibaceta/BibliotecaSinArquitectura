@@ -1,62 +1,76 @@
+# 📚 Proyecto Biblioteca Modular
 
-# Instrucciones para la actividad
+Este proyecto es una reestructuración de un sistema monolítico de gestión de biblioteca, aplicando arquitectura modular dentro de un monolito, para mantenimiento y escalabilidad.
 
-## 🔧 Reestructuración del Proyecto: Ejercicio de Arquitectura Modular
+# 🧱 Estructura del Proyecto
+```
+📁 src/
+├── 📁 main/
+│   └── 📁 java/
+│       └── 📁 library/
+│           ├── 📁 domain/   # Entidades principales del dominio
+│           │   ├── Book.java
+│           │   ├── Library.java
+│           │   └── User.java
+│           ├── 📁 loan/     # Reglas y lógica de préstamos
+│           │   ├── LoanPolicy.java
+│           │   ├── LoanPolicyResolver.java
+│           │   ├── LoanService.java
+│           │   ├── StudentLoanPolicy.java
+│           │   └── TeacherLoanPolicy.java
+│           ├── 📁 report/    # Generador de reportes
+│           │   └── LibraryReportGenerator.java
+│           └── Main.java     # Clase ejecutable principal
+├── 📁 test/
+│   └── 📁 java/
+│       └── 📁 library/
+│           ├── LibraryTest.java
+│           ├── UserTest.java
+│           ├── loan/
+│           │   ├── LoanPolicyTest.java
+│           │   └── LoanServiceTest.java
+│           └── report/
+│               └── LibraryReportGeneratorTest.java
+└── pom.xml                   # Configuración Maven
+```
 
-Este proyecto de biblioteca fue desarrollado inicialmente sin una arquitectura modular clara. 
-Como parte del curso, el objetivo de esta actividad es **proponer una nueva arquitectura interna del sistema**.
+# 🚀 Cómo ejecutar el proyecto desde cero
 
-**modularizando el monolito**, sin necesidad de migrarse a microservicios u otros enfoques más complejos.
+1. 🧰 Requisitos
 
-## 🎯 Objetivo
+- Java 17 instalado
 
-Rediseñar la estructura del sistema para que sea más clara, escalable y fácil de mantener, 
-usando un monolito con una arquitectura modular.
+- Maven 3.6.3 instalado
 
-### 🧠 Lógica actual del sistema
+2. 🔧 Clonar o posicionarte en el proyecto
 
-- **Estudiantes** pueden tomar prestados hasta **3 libros** simultáneamente.
-- **Profesores** pueden tomar hasta **5 libros**.
-- La clase `Library` administra los préstamos y verifica si el usuario aún puede tomar otro libro.
-- No hay una separación clara de responsabilidades (por ejemplo, las reglas de préstamo están embebidas en la lógica general).
-- Tampoco hay una estructura modular del sistema que permita escalarlo fácilmente o mantenerlo en el tiempo.
+```sh
+cd ~/test_1_codigo_house/src
+```
 
-Este proyecto fue construido sin aplicar principios de arquitectura, y servirá como punto de partida para repensar su diseño organizacional.
+3. 🧪 Ejecutar las pruebas
 
----
+```sh
+mvn clean test
+```
 
-## 📐 Formas de entrega según tu perfil
+Verás una salida indicando cuántos tests pasaron.
 
-Hay **dos formas de entregar esta actividad**, dependiendo de tu nivel de familiaridad con la programación:
+4. ▶️ Ejecutar el programa principal
 
-### 👨‍💻 Si eres un programador activo o manejas Java
+```sh
+mvn compile exec:java
+```
 
-Puedes realizar la entrega directamente como código:
+Asegúrate de que Main.java contiene un método main() dentro del paquete library.
 
-- Refactoriza el proyecto original aplicando una estructura modular clara.
-- Organiza tu Pull Request (PR) incluyendo la nueva estructura de carpetas y clases.
-- Acompaña el PR con un resumen breve de tu propuesta de arquitectura en el `README.md`.
 
-### ✍️ Si no eres programador activo o Java no es tu lenguaje principal
+# 📦 Modularización aplicada
 
-Puedes entregar tu propuesta en formato visual:
+- `domain`: representa el núcleo del modelo de negocio (libros, usuarios, biblioteca).
 
-- Un diagrama que represente la estructura de carpetas que propones.
-- Un diagrama de clases conceptual que muestre cómo modularizarías las entidades y responsabilidades.
-- Puedes usar herramientas como [draw.io](https://app.diagrams.net/), Lucidchart, Figma, o incluso una imagen dibujada a mano clara.
+- `loan`: contiene la lógica de negocio para préstamos, políticas por tipo de usuario y el servicio que lo gestiona.
 
-## 📬 Entrega
+- `report`: genera reportes de estado de la biblioteca.
 
-- Si vas a hacer una **entrega con código Java**, organiza tu PR con la estructura propuesta y asegúrate de explicar brevemente tu diseño en el `README.md`.
-- Si vas a entregar diagramas, **envíalos al correo**:
-
-  **📧** mail@joelibaceta.com  
-  **📝 Asunto:** `Arquitectura de Software G3 - Nombre y Apellido - Evaluacion 1`
-
-## ✅ ¿Qué se evaluará?
-
-- Claridad en la separación de responsabilidades.
-- Lógica de modularización adecuada (no todo junto en un solo paquete).
-- Coherencia en el uso de capas o módulos
-- Entregables completos y bien justificados (diagrama y/o código).
-- Presentación ordenada y profesional.
+- `Main.java`: simula el uso del sistema y permite iniciar la app desde consola.
