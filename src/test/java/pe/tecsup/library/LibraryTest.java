@@ -1,11 +1,10 @@
-package test.java;
+package pe.tecsup.library;
 
-import main.java.Book;
-import main.java.Library;
-import main.java.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LibraryTest {
 

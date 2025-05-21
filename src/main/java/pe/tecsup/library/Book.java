@@ -1,4 +1,4 @@
-package main.java;
+package pe.tecsup.library;
 
 public class Book {
     private String title;

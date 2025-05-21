@@ -1,4 +1,4 @@
-package main.java;
+package pe.tecsup.library;
 
 public class Main {
     public static void main(String[] args) {
