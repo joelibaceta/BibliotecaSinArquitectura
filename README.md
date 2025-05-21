@@ -60,3 +60,129 @@ Puedes entregar tu propuesta en formato visual:
 - Coherencia en el uso de capas o módulos
 - Entregables completos y bien justificados (diagrama y/o código).
 - Presentación ordenada y profesional.
+
+# Resolucion del Problema Planteado
+## Alumno: Carlos Eduardo Cóndor Callupe
+## Curso: Bootcamp de Arquitectura de Software
+## Refactor: Estructura Modular en Java
+
+Se reorganizó el proyecto aplicando una estructura modular:
+
+- `/model`: Entidades del sistema (Libro, Usuario).
+- `/service`: Lógica principal del sistema (gestión de libros, préstamos).
+- `/app`: Clase Main para ejecutar el sistema.
+
+Esto permite mayor claridad, separación de responsabilidades y facilita futuras ampliaciones.
+
+## Diagrama de clases de la App Library
+```mermaid
+
+classDiagram
+    class Book {
+        - String title
+        + Book(String title)
+        + getTitle(): String
+    }
+
+    class User {
+        - String name
+        - String type
+        - List~Book~ borrowedBooks
+        + User(String name, String type)
+        + borrowBook(Book): void
+        + returnBook(Book): void
+        + getType(): String
+        + getBorrowedBooks(): List~Book~
+        + getName(): String
+    }
+
+    class LibraryService {
+        - List~Book~ books
+        - List~User~ users
+        + LibraryService()
+        + addBook(Book): void
+        + removeBook(Book): void
+        + registerUser(User): void
+        + borrowBook(User, Book): boolean
+        + returnBook(User, Book): void
+        + generateReport(): String
+        + isBookAvailable(Book): boolean
+        + getBooks(): List~Book~
+        + getUsers(): List~User~
+    }
+
+    Book --> User : used by
+    User --> LibraryService : registered in
+    Book --> LibraryService : managed by
+```
+
+## Diagrama de Secuencia Prestar Libro
+
+```mermaid
+sequenceDiagram
+    participant Main
+    participant LibraryService
+    participant User
+
+    Main->>LibraryService: borrowBook(user, book)
+    LibraryService->>LibraryService: isBookAvailable(book)
+    alt Libro disponible
+        LibraryService->>User: getType()
+        alt Usuario: Student y < 2 libros
+            LibraryService->>User: borrowBook(book)
+            LibraryService->>LibraryService: removeBook(book)
+            LibraryService-->>Main: true
+        else Usuario: Teacher y < 5 libros
+            LibraryService->>User: borrowBook(book)
+            LibraryService->>LibraryService: removeBook(book)
+            LibraryService-->>Main: true
+        else Límite alcanzado
+            LibraryService-->>Main: false
+        end
+    else Libro no disponible
+        LibraryService-->>Main: false
+    end
+```
+
+## Diagrama de Secuencia Devolver Libro
+
+```mermaid
+sequenceDiagram
+    participant Main
+    participant LibraryService
+    participant User
+    
+    Main->>LibraryService: returnBook(user, book)
+    LibraryService->>LibraryService: isBookAvailable(book)
+    alt Libro NO disponible en biblioteca
+        LibraryService->>User: returnBook(book)
+        User-->>LibraryService: libro eliminado de la lista del usuario
+        LibraryService->>LibraryService: addBook(book)
+    else Libro ya disponible
+        Note over LibraryService: No se realiza ninguna acción
+    end
+```
+
+## Diagrama de Componentes
+
+```mermaid
+graph TD
+
+subgraph App
+    Main[Main.java]
+end
+
+subgraph Service Layer
+    LibraryService[LibraryService.java]
+end
+
+subgraph Domain Model
+    Book[Book.java]
+    User[User.java]
+end
+
+Main --> LibraryService
+LibraryService --> Book
+LibraryService --> User
+
+```
