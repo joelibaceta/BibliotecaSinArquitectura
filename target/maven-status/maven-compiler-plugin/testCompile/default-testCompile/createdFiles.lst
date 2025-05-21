@@ -1,0 +1,6 @@
+test/java/LibraryTest.class
+UserTest.class
+library/loan/LoanServiceTest.class
+library/SanityTest.class
+library/report/LibraryReportGeneratorTest.class
+library/loan/LoanPolicyTest.class

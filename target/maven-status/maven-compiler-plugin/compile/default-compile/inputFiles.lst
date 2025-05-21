@@ -1,0 +1,10 @@
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/Main.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/loan/LoanService.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/report/LibraryReportGenerator.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/loan/TeacherLoanPolicy.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/loan/StudentLoanPolicy.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/loan/LoanPolicyResolver.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/domain/User.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/domain/Book.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/domain/Library.java
+/root/test_1_codigo_house/src/BibliotecaSinArquitectura/main/java/library/loan/LoanPolicy.java

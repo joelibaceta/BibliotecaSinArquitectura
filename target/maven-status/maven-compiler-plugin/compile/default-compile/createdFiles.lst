@@ -1,0 +1,10 @@
+library/domain/Library.class
+library/report/LibraryReportGenerator.class
+library/loan/LoanPolicyResolver.class
+library/loan/StudentLoanPolicy.class
+library/domain/User.class
+library/loan/TeacherLoanPolicy.class
+library/Main.class
+library/domain/Book.class
+library/loan/LoanPolicy.class
+library/loan/LoanService.class

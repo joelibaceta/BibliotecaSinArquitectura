@@ -1,4 +1,8 @@
-package main.java;
+package library;
+
+import library.domain.User;
+import library.domain.Library;
+import library.domain.Book;
 
 public class Main {
     public static void main(String[] args) {

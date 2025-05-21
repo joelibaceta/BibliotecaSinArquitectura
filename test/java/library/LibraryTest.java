@@ -1,8 +1,9 @@
 package test.java;
 
-import main.java.Book;
-import main.java.Library;
-import main.java.User;
+import library.domain.User;
+import library.domain.Library;
+import library.domain.Book;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

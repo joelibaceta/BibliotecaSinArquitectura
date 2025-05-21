@@ -1,4 +1,4 @@
-package main.java;
+package library.domain;
 
 public class Book {
     private String title;
