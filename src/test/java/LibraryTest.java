@@ -1,15 +1,28 @@
 package test.java;
 
+import main.java.library.domain.model.Book;
+import main.java.library.domain.model.User;
+import main.java.library.infrastructure.repository.InMemoryBookRepository;
+import main.java.library.infrastructure.repository.InMemoryUserRepository;
+import main.java.library.usecase.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import main.java.library.service.LibraryService;
-import main.java.library.model.Book;
-import main.java.library.model.User;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LibraryTest {
 
-    private LibraryService library;
+    private InMemoryBookRepository bookRepository;
+    private InMemoryUserRepository userRepository;
+
+    private AddBookUseCase addBookUseCase;
+    private RemoveBookUseCase removeBookUseCase;
+    private RegisterUserUseCase registerUserUseCase;
+    private BorrowBookUseCase borrowBookUseCase;
+    private ReturnBookUseCase returnBookUseCase;
+    private GenerateReportUseCase generateReportUseCase;
+
     private Book book1;
     private Book book2;
     private User student;
@@ -17,77 +30,89 @@ public class LibraryTest {
 
     @BeforeEach
     public void setUp() {
-        library = new LibraryService();
+        bookRepository = new InMemoryBookRepository();
+        userRepository = new InMemoryUserRepository();
+
+        addBookUseCase = new AddBookUseCase(bookRepository);
+        removeBookUseCase = new RemoveBookUseCase(bookRepository);
+        registerUserUseCase = new RegisterUserUseCase(userRepository);
+        borrowBookUseCase = new BorrowBookUseCase(bookRepository, userRepository);
+        returnBookUseCase = new ReturnBookUseCase(bookRepository);
+        generateReportUseCase = new GenerateReportUseCase(bookRepository, userRepository);
+
         book1 = new Book("The Catcher in the Rye");
         book2 = new Book("1984");
+
         student = new User("Alice", "Student");
         teacher = new User("Bob", "Teacher");
 
-        library.addBook(book1);
-        library.addBook(book2);
-        library.registerUser(student);
-        library.registerUser(teacher);
+        addBookUseCase.execute(book1);
+        addBookUseCase.execute(book2);
+        registerUserUseCase.execute(student);
+        registerUserUseCase.execute(teacher);
     }
 
     @Test
     public void testAddBook() {
         Book book3 = new Book("To Kill a Mockingbird");
-        library.addBook(book3);
-        assertTrue(library.getBooks().contains(book3));
+        addBookUseCase.execute(book3);
+        assertTrue(bookRepository.getAll().contains(book3));
     }
 
     @Test
     public void testRemoveBook() {
-        library.removeBook(book1);
-        assertFalse(library.getBooks().contains(book1));
+        removeBookUseCase.execute(book1);
+        assertFalse(bookRepository.getAll().contains(book1));
     }
 
     @Test
     public void testRegisterUser() {
         User newUser = new User("Charlie", "Student");
-        library.registerUser(newUser);
-        assertTrue(library.getUsers().contains(newUser));
+        registerUserUseCase.execute(newUser);
+        assertTrue(userRepository.findAll().contains(newUser));
     }
 
     @Test
     public void testBorrowBookForStudent() {
-        boolean borrowed = library.borrowBook(student, book1);
+        boolean borrowed = borrowBookUseCase.execute(student, book1, bookRepository);
         assertTrue(borrowed);
-        assertFalse(library.getBooks().contains(book1));
+        assertFalse(bookRepository.getAll()).contains(book1);
         assertTrue(student.getBorrowedBooks().contains(book1));
     }
 
     @Test
     public void testBorrowBookLimitForStudent() {
-        library.borrowBook(student, book1);
-        library.borrowBook(student, book2);
-        Book book3 = new Book("Moby Dick");
-        library.addBook(book3);
+        borrowBookUseCase.execute(student, book1, bookRepository);
+        borrowBookUseCase.execute(student, book1, bookRepository);
 
-        boolean borrowed = library.borrowBook(student, book3);
+        Book book3 = new Book("Moby Dick");
+        addBookUseCase.execute(book3);
+
+        boolean borrowed = borrowBookUseCase.execute(student, book3, bookRepository);
         assertFalse(borrowed);
     }
 
     @Test
     public void testBorrowBookForTeacher() {
-        boolean borrowed = library.borrowBook(teacher, book1);
+        boolean borrowed = borrowBookUseCase.execute(student, book1, bookRepository);
         assertTrue(borrowed);
-        assertFalse(library.getBooks().contains(book1));
+        assertFalse(bookRepository.getAll().contains(book1));
         assertTrue(teacher.getBorrowedBooks().contains(book1));
     }
 
     @Test
     public void testReturnBook() {
-        library.borrowBook(student, book1);
-        library.returnBook(student, book1);
-        assertTrue(library.getBooks().contains(book1));
+        borrowBookUseCase.execute(student, book1, bookRepository);
+        returnBookUseCase.execute(student, book1, bookRepository);
+        assertTrue(bookRepository.getAll().contains(book1));
         assertFalse(student.getBorrowedBooks().contains(book1));
     }
 
     @Test
     public void testGenerateReport() {
-        library.borrowBook(student, book1);
-        String report = library.generateReport();
+        borrowBookUseCase.execute(student, book1, bookRepository);
+        String report = generateReportUseCase.execute(bookRepository, userRepository);
+
         assertTrue(report.contains("Available Books:"));
         assertTrue(report.contains("Borrowed Books:"));
         assertTrue(report.contains("1984"));

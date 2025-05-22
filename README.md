@@ -66,11 +66,13 @@ Puedes entregar tu propuesta en formato visual:
 ## Curso: Bootcamp de Arquitectura de Software
 ## Refactor: Estructura Modular en Java
 
-Se reorganizó el proyecto aplicando una estructura modular:
+Se reorganizó el proyecto aplicando una estructura modular con clean architecture:
 
-- `/model`: Entidades del sistema (Libro, Usuario).
-- `/service`: Lógica principal del sistema (gestión de libros, préstamos).
-- `/app`: Clase Main para ejecutar el sistema.
+- `/domain/model`: Entidades del sistema. Representan los conceptos del dominio como Book y User. Estas clases solo contienen lógica propia del objeto (por ejemplo, métodos para pedir o devolver un libro).
+- `/domain/repository`: Interfaces que definen los contratos para acceder a los datos (por ejemplo, BookRepository, UserRepository). No contienen implementación.
+- `/usecase`: Lógica de aplicación. Cada clase implementa un caso de uso concreto del sistema como agregar un libro, registrar un usuario o generar un reporte (AddBookUseCase, RegisterUserUseCase, etc.).
+- `/infrastructure/repository`: Implementaciones concretas de los repositorios definidos en domain/repository. Por ejemplo, InMemoryBookRepository almacena los datos en memoria.
+- `/app`:unto de entrada de la aplicación. La clase Main.java se encarga de armar los casos de uso y orquestar el flujo principal del programa.
 
 Esto permite mayor claridad, separación de responsabilidades y facilita futuras ampliaciones.
 
@@ -78,111 +80,191 @@ Esto permite mayor claridad, separación de responsabilidades y facilita futuras
 ```mermaid
 
 classDiagram
+    direction LR
+
     class Book {
-        - String title
-        + Book(String title)
-        + getTitle(): String
+        - title : String
+        + getTitle() : String
     }
 
     class User {
-        - String name
-        - String type
-        - List~Book~ borrowedBooks
-        + User(String name, String type)
-        + borrowBook(Book): void
-        + returnBook(Book): void
-        + getType(): String
-        + getBorrowedBooks(): List~Book~
-        + getName(): String
+        - name : String
+        - type : String
+        - borrowedBooks : List~Book~
+        + getName() : String
+        + getType() : String
+        + getBorrowedBooks() : List~Book~
+        + borrowBook(book: Book) : void
+        + returnBook(book: Book) : void
     }
 
-    class LibraryService {
-        - List~Book~ books
-        - List~User~ users
-        + LibraryService()
-        + addBook(Book): void
-        + removeBook(Book): void
-        + registerUser(User): void
-        + borrowBook(User, Book): boolean
-        + returnBook(User, Book): void
-        + generateReport(): String
-        + isBookAvailable(Book): boolean
-        + getBooks(): List~Book~
-        + getUsers(): List~User~
+    class BookRepository {
+        <<interface>>
+        + add(Book) : void
+        + remove(Book) : void
+        + findAll() : List~Book~
+        + exists(Book) : boolean
     }
 
-    Book --> User : used by
-    User --> LibraryService : registered in
-    Book --> LibraryService : managed by
+    class UserRepository {
+        <<interface>>
+        + add(User) : void
+        + findAll() : List~User~
+        + exists(User) : boolean
+    }
+
+    class InMemoryBookRepository {
+        - books : List~Book~
+        + add(Book) : void
+        + remove(Book) : void
+        + findAll() : List~Book~
+        + exists(Book) : boolean
+    }
+
+    class InMemoryUserRepository {
+        - users : List~User~
+        + add(User) : void
+        + findAll() : List~User~
+        + exists(User) : boolean
+    }
+
+    class AddBookUseCase {
+        - bookRepository : BookRepository
+        + execute(Book) : void
+    }
+
+    class RemoveBookUseCase {
+        - bookRepository : BookRepository
+        + execute(Book) : void
+    }
+
+    class RegisterUserUseCase {
+        - userRepository : UserRepository
+        + execute(User) : void
+    }
+
+    class BorrowBookUseCase {
+        - bookRepository : BookRepository
+        - userRepository : UserRepository
+        + execute(User, Book) : boolean
+    }
+
+    class ReturnBookUseCase {
+        - bookRepository : BookRepository
+        - userRepository : UserRepository
+        + execute(User, Book) : void
+    }
+
+    class GenerateReportUseCase {
+        - bookRepository : BookRepository
+        - userRepository : UserRepository
+        + execute() : String
+    }
+
+    class Main
+
+    %% Relationships
+    InMemoryBookRepository --|> BookRepository
+    InMemoryUserRepository --|> UserRepository
+
+    AddBookUseCase --> BookRepository
+    RemoveBookUseCase --> BookRepository
+    RegisterUserUseCase --> UserRepository
+    BorrowBookUseCase --> BookRepository
+    BorrowBookUseCase --> UserRepository
+    ReturnBookUseCase --> BookRepository
+    ReturnBookUseCase --> UserRepository
+    GenerateReportUseCase --> BookRepository
+    GenerateReportUseCase --> UserRepository
+
+    Main --> AddBookUseCase
+    Main --> RemoveBookUseCase
+    Main --> RegisterUserUseCase
+    Main --> BorrowBookUseCase
+    Main --> ReturnBookUseCase
+    Main --> GenerateReportUseCase
+
+    User "1" o-- "*" Book : borrows
+
 ```
 
 ## Diagrama de Secuencia Prestar Libro
 
 ```mermaid
 sequenceDiagram
-    participant Main
-    participant LibraryService
-    participant User
+    participant Usuario
+    participant SistemaBiblioteca
+    participant Libro
 
-    Main->>LibraryService: borrowBook(user, book)
-    LibraryService->>LibraryService: isBookAvailable(book)
+    Usuario->>SistemaBiblioteca: Solicita préstamo de libro
+    SistemaBiblioteca->>Libro: Verifica disponibilidad
     alt Libro disponible
-        LibraryService->>User: getType()
-        alt Usuario: Student y < 2 libros
-            LibraryService->>User: borrowBook(book)
-            LibraryService->>LibraryService: removeBook(book)
-            LibraryService-->>Main: true
-        else Usuario: Teacher y < 5 libros
-            LibraryService->>User: borrowBook(book)
-            LibraryService->>LibraryService: removeBook(book)
-            LibraryService-->>Main: true
-        else Límite alcanzado
-            LibraryService-->>Main: false
-        end
+        Libro-->>SistemaBiblioteca: Disponible
+        SistemaBiblioteca->>Usuario: Libro disponible
+        Usuario->>SistemaBiblioteca: Confirma préstamo
+        SistemaBiblioteca->>Libro: Registra préstamo
+        SistemaBiblioteca->>Usuario: Préstamo registrado
     else Libro no disponible
-        LibraryService-->>Main: false
-    end
-```
-
-## Diagrama de Secuencia Devolver Libro
-
-```mermaid
-sequenceDiagram
-    participant Main
-    participant LibraryService
-    participant User
-    
-    Main->>LibraryService: returnBook(user, book)
-    LibraryService->>LibraryService: isBookAvailable(book)
-    alt Libro NO disponible en biblioteca
-        LibraryService->>User: returnBook(book)
-        User-->>LibraryService: libro eliminado de la lista del usuario
-        LibraryService->>LibraryService: addBook(book)
-    else Libro ya disponible
-        Note over LibraryService: No se realiza ninguna acción
+        Libro-->>SistemaBiblioteca: No disponible
+        SistemaBiblioteca->>Usuario: Libro no disponible
     end
 ```
 
 ## Diagrama de Componentes
 
 ```mermaid
-graph TD
+graph TB
 
-subgraph App
-    Main[Main.java]
+%% Capa de Aplicación
+subgraph "Aplicación"
+    MainApp["Main.java"]
 end
 
-subgraph Service Layer
-    LibraryService[LibraryService.java]
+%% Casos de uso (Application Layer)
+subgraph "Casos de Uso (Application Layer)"
+    AddBookUC["AddBookUseCase"]
+    RemoveBookUC["RemoveBookUseCase"]
+    RegisterUserUC["RegisterUserUseCase"]
+    BorrowBookUC["BorrowBookUseCase"]
+    ReturnBookUC["ReturnBookUseCase"]
+    GenerateReportUC["GenerateReportUseCase"]
 end
 
-subgraph Domain Model
-    Book[Book.java]
-    User[User.java]
+%% Dominio
+subgraph "Dominio"
+    Book["Book (Entidad)"]
+    User["User (Entidad)"]
+    BookRepo["BookRepository (Interface)"]
+    UserRepo["UserRepository (Interface)"]
 end
 
-Main --> LibraryService
-LibraryService --> Book
-LibraryService --> User
+%% Infraestructura
+subgraph "Infraestructura"
+    BookRepoImpl["BookRepositoryImpl"]
+    UserRepoImpl["UserRepositoryImpl"]
+end
+
+%% Relaciones
+MainApp --> AddBookUC
+MainApp --> RemoveBookUC
+MainApp --> RegisterUserUC
+MainApp --> BorrowBookUC
+MainApp --> ReturnBookUC
+MainApp --> GenerateReportUC
+
+AddBookUC --> BookRepo
+RemoveBookUC --> BookRepo
+RegisterUserUC --> UserRepo
+BorrowBookUC --> BookRepo
+BorrowBookUC --> UserRepo
+BorrowBookUC --> User
+ReturnBookUC --> BookRepo
+ReturnBookUC --> UserRepo
+ReturnBookUC --> User
+GenerateReportUC --> BookRepo
+GenerateReportUC --> UserRepo
+
+BookRepoImpl --> BookRepo
+UserRepoImpl --> UserRepo
 
 ```

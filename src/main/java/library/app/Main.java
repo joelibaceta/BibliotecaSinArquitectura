@@ -1,49 +1,39 @@
 package main.java.library.app;
 
-import main.java.library.service.LibraryService;
-import main.java.library.model.Book;
-import main.java.library.model.User;
+import main.java.library.domain.model.Book;
+import main.java.library.domain.model.User;
+import main.java.library.infrastructure.repository.InMemoryBookRepository;
+import main.java.library.infrastructure.repository.InMemoryUserRepository;
+import main.java.library.usecase.BorrowBookUseCase;
+import main.java.library.usecase.ReturnBookUseCase;
+import main.java.library.usecase.GenerateReportUseCase;
 
 public class Main {
     public static void main(String[] args) {
-        LibraryService library = new LibraryService();
+        var bookRepo = new InMemoryBookRepository();
+        var userRepo = new InMemoryUserRepository();
 
-        Book book1 = new Book("The Catcher in the Rye");
-        Book book2 = new Book("To Kill a Mockingbird");
-        Book book3 = new Book("1984");
+        var book1 = new Book("1984");
+        var book2 = new Book("To Kill a Mockingbird");
 
-        
-        library.addBook(book1);
-        library.addBook(book2);
-        library.addBook(book3);
+        bookRepo.add(book1);
+        bookRepo.add(book2);
 
-        User student = new User("Alice", "Student");
-        User teacher = new User("Bob", "Teacher");
+        var user = new User("Alice", "Student");
+        userRepo.add(user);
 
-        library.registerUser(student);
-        library.registerUser(teacher);
+        var borrow = new BorrowBookUseCase(bookRepo, userRepo);
+        var returned = new ReturnBookUseCase(bookRepo);
+        var report = new GenerateReportUseCase(bookRepo, userRepo);
 
-        System.out.println("Préstamos de libros:");
-        if (library.borrowBook(student, book1)) {
-            System.out.println(student.getName() + " ha tomado prestado: " + book1.getTitle());
+        if (borrow.execute(user, book1, bookRepo)) {
+            System.out.println(user.getName() + " ha tomado prestado: " + book1.getTitle());
         }
 
-        if (library.borrowBook(teacher, book2)) {
-            System.out.println(teacher.getName() + " ha tomado prestado: " + book2.getTitle());
-        }
+        returned.execute(user, book1, bookRepo);
+        System.out.println(user.getName() + " ha devuelto: " + book1.getTitle());
 
-        if (library.borrowBook(student, book3)) {
-            System.out.println(student.getName() + " ha tomado prestado: " + book3.getTitle());
-        } else {
-            System.out.println(student.getName() + " no pudo tomar prestado: " + book3.getTitle() + " (límite alcanzado)");
-        }
-
-        System.out.println("\nDevolución de libros:");
-        library.returnBook(student, book1);
-        System.out.println(student.getName() + " ha devuelto: " + book1.getTitle());
-
-        System.out.println("\nReporte de la Biblioteca:");
-        System.out.println(library.generateReport());
+        System.out.println(report.execute(bookRepo, userRepo));
     }
 }
 
