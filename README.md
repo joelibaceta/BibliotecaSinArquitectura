@@ -1,4 +1,85 @@
+# Solucion de la actividad modulo 1 - Jonathan Oblitas
+Refactorización: Arquitectura Modular
+Esta solución implementa una arquitectura en capas clásica, en lugar de una arquitectura limpia, priorizando simplicidad, legibilidad y una separación más clara de responsabilidades. Las clases están organizadas por función en las capas de aplicación, dominio, persistencia.
 
+## qué se buscó conseguir ?
+- Claridad en la separacion de responsabilidades
+- Codigo modular y más legible
+
+## ✅ Cambios realizados en la refactorización
+### 🔁 Aplicación de estilo arquitectonico en capas
+
+El sistema se dividió en tres capas principales:
+
+- **`app/`**: contiene el `Main.java`, que actúa como punto de entrada del sistema.
+- **`domain/`**: incluye la lógica central del sistema, entidades, políticas de préstamo y generación de reportes.
+- **`persistence/`**: contiene las clases que simulan el almacenamiento de datos.
+
+---
+
+###  Organización de carpetas por responsabilidad
+
+### 📂 Domain
+- `model`: entidades (`Book`, `User`, `Library`).
+- 
+- `policy`: reglas de préstamo según el tipo de usuario (`StudentLoanPolicy`, `TeacherLoanPolicy`).
+- 
+- `report`: generación de reportes (`LibraryReportGenerator`).
+### 📂 Persistence
+- `BookRepository.java` y `UserRepository.java`: almacenamiento simulado.
+
+### 📂 app
+- `app/Main.java`: orquestador de flujo general.
+
+---
+
+
+### 🧠 Algunos Principios SOLID aplicados 
+
+- **SRP**: cada clase busca cumplir una única función.
+- **OCP**: nuevas reglas de préstamo pueden añadirse sin modificar las existentes Y también lo mismo con los reportes.
+---
+
+###  Sobre el test
+- se modifico el test para que se pudiesen hacer las pruebas
+---
+
+## 🔄 Diagrama de Secuencia: Préstamo de Libro
+````
+Usuario
+│
+│ Solicita préstamo de libro
+▼
+Main.java
+│
+│ Llama a Library.borrowBook(user, book)
+▼
+Library.java
+│
+│ Verifica si el libro está disponible:
+│ → bookRepository.exists(book)
+│ ← true / false
+│
+│ Si está disponible:
+│ Determina el tipo de usuario:
+│ ├─ Si Student:
+│ │ → studentLoanPolicy.canBorrow(user)
+│ │ ← true / false
+│ └─ Si Teacher:
+│ → teacherLoanPolicy.canBorrow(user)
+│ ← true / false
+│
+│ Si puede tomar prestado:
+│ → user.borrowBook(book)
+│ → bookRepository.delete(book)
+▼
+Retorna resultado a Main.java
+````
+---
+
+---
+
+---
 # Instrucciones para la actividad
 
 ## 🔧 Reestructuración del Proyecto: Ejercicio de Arquitectura Modular

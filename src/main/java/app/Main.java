@@ -1,9 +1,20 @@
-package main.java;
+package main.java.app;
+
+import main.java.domain.model.Library;
+import main.java.domain.model.Book;
+import main.java.domain.model.User;
+import main.java.domain.policy.StudentLoanPolicy;
+import main.java.domain.policy.TeacherLoanPolicy;
+import main.java.domain.report.LibraryReportGenerator;
+import main.java.persistence.BookRepository;
+import main.java.persistence.UserRepository;
 
 public class Main {
     public static void main(String[] args) {
+
         // Crear instancia de la biblioteca
-        Library library = new Library();
+        Library library = new Library(
+                new StudentLoanPolicy() , new TeacherLoanPolicy(), new BookRepository() , new UserRepository());
 
         // Crear algunos libros
         Book book1 = new Book("The Catcher in the Rye");
@@ -51,6 +62,7 @@ public class Main {
 
         // Generar y mostrar el reporte de la biblioteca
         System.out.println("\nReporte de la Biblioteca:");
-        System.out.println(library.generateReport());
+        LibraryReportGenerator reportGenerator = new LibraryReportGenerator();
+        System.out.println(reportGenerator.generateReport(library));
     }
 }

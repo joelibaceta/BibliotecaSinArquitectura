@@ -1,8 +1,13 @@
 package test.java;
 
-import main.java.Book;
-import main.java.Library;
-import main.java.User;
+import main.java.domain.model.Book;
+import main.java.domain.model.Library;
+import main.java.domain.model.User;
+import main.java.domain.policy.StudentLoanPolicy;
+import main.java.domain.policy.TeacherLoanPolicy;
+import main.java.domain.report.LibraryReportGenerator;
+import main.java.persistence.BookRepository;
+import main.java.persistence.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,10 +20,16 @@ public class LibraryTest {
     private User student;
     private User teacher;
 
+    private BookRepository bookRepository;
+    private UserRepository userRepository;
+
     @BeforeEach
     public void setUp() {
+        bookRepository = new BookRepository();
+        userRepository = new UserRepository();
+
         // Inicializar la biblioteca y objetos de prueba
-        library = new Library();
+        library = new Library(new StudentLoanPolicy() , new TeacherLoanPolicy() , bookRepository , userRepository);
         book1 = new Book("The Catcher in the Rye");
         book2 = new Book("1984");
         student = new User("Alice", "Student");
@@ -88,7 +99,9 @@ public class LibraryTest {
     @Test
     public void testGenerateReport() {
         library.borrowBook(student, book1);
-        String report = library.generateReport();
+        LibraryReportGenerator reportGenerator = new LibraryReportGenerator();
+//        String report = library.generateReport();
+        String report = reportGenerator.generateReport(library);
         assertTrue(report.contains("Available Books:"), "El reporte debería contener la sección de libros disponibles");
         assertTrue(report.contains("Borrowed Books:"), "El reporte debería contener la sección de libros prestados");
         assertTrue(report.contains("1984"), "El reporte debería listar el libro '1984' como disponible");
