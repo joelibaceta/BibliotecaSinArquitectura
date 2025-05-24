@@ -4,7 +4,7 @@ import pe.tecsup.library.model.User;
 import pe.tecsup.library.model.UserType;
 
 public class StudentLoanRule implements LoanRule {
-    private static final int MAX_BOOKS = 2;
+    private static final int MAX_BOOKS = 3;
 
     @Override
     public boolean canBorrow(User user) {

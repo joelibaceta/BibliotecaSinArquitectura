@@ -11,16 +11,23 @@ public class User {
     private final List<Book> borrowedBooks;
 
     public User(String name, UserType type) {
+        if (name == null) throw new IllegalArgumentException("Name cannot be null");
+        if (type == null) throw new IllegalArgumentException("UserType cannot be null");
+
         this.name = name;
         this.type = type;
         this.borrowedBooks = new ArrayList<>();
     }
 
     public void borrowBook(Book book) {
+        if (book == null) throw new IllegalArgumentException("Book cannot be null");
+
         borrowedBooks.add(book);
     }
 
     public void returnBook(Book book) {
+        if (book == null) throw new IllegalArgumentException("Book cannot be null");
+
         borrowedBooks.remove(book);
     }
 

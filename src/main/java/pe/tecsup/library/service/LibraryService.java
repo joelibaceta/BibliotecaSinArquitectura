@@ -52,8 +52,13 @@ public class LibraryService {
     public boolean borrowBook(User user, Book book) {
         if (user == null || book == null) return false;
 
+        if (!users.contains(user)) {
+            throw new IllegalArgumentException("User must be registered before borrowing books");
+        }
+
         if (books.contains(book)) {
             LoanRule rule = loanRules.get(user.getType());
+
             if (rule != null && rule.canBorrow(user)) {
                 user.borrowBook(book);
                 books.remove(book);
@@ -67,10 +72,12 @@ public class LibraryService {
     public void returnBook(User user, Book book) {
         if (user == null || book == null) return;
 
-        if (!books.contains(book)) {
-            user.returnBook(book);
-            books.add(book);
+        if (books.contains(book)) {
+            return;
         }
+
+        user.returnBook(book);
+        books.add(book);
     }
 
     public String generateReport() {

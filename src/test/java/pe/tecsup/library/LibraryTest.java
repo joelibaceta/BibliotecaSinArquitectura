@@ -64,7 +64,12 @@ public class LibraryTest {
         library.borrowBook(student, book1);
         library.borrowBook(student, book2);
         Book book3 = new Book("Moby Dick");
+        Book book4 = new Book("War and Peace");
         library.addBook(book3);
+        library.addBook(book4);
+        library.borrowBook(student, book3);
+        library.borrowBook(student, book4);
+
 
         boolean borrowed = library.borrowBook(student, book3);
         assertFalse(borrowed, "El estudiante no debería poder tomar prestado más libros que el límite permitido");
