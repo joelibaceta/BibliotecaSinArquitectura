@@ -1,15 +1,18 @@
-package test.java;
+package pe.tecsup.library;
 
-import main.java.Book;
-import main.java.Library;
-import main.java.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import pe.tecsup.library.model.Book;
+import pe.tecsup.library.model.User;
+import pe.tecsup.library.model.UserType;
+import pe.tecsup.library.service.LibraryService;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LibraryTest {
 
-    private Library library;
+    private LibraryService library;
     private Book book1;
     private Book book2;
     private User student;
@@ -17,13 +20,11 @@ public class LibraryTest {
 
     @BeforeEach
     public void setUp() {
-        // Inicializar la biblioteca y objetos de prueba
-        library = new Library();
+        library = new LibraryService();
         book1 = new Book("The Catcher in the Rye");
         book2 = new Book("1984");
-        student = new User("Alice", "Student");
-        teacher = new User("Bob", "Teacher");
-
+        student = new User("Alice", UserType.STUDENT);
+        teacher = new User("Bob", UserType.TEACHER);
         library.addBook(book1);
         library.addBook(book2);
         library.registerUser(student);
@@ -45,7 +46,7 @@ public class LibraryTest {
 
     @Test
     public void testRegisterUser() {
-        User newUser = new User("Charlie", "Student");
+        User newUser = new User("Charlie", UserType.STUDENT);
         library.registerUser(newUser);
         assertTrue(library.getUsers().contains(newUser), "La biblioteca debería contener el usuario registrado");
     }
@@ -63,7 +64,12 @@ public class LibraryTest {
         library.borrowBook(student, book1);
         library.borrowBook(student, book2);
         Book book3 = new Book("Moby Dick");
+        Book book4 = new Book("War and Peace");
         library.addBook(book3);
+        library.addBook(book4);
+        library.borrowBook(student, book3);
+        library.borrowBook(student, book4);
+
 
         boolean borrowed = library.borrowBook(student, book3);
         assertFalse(borrowed, "El estudiante no debería poder tomar prestado más libros que el límite permitido");
@@ -95,3 +101,4 @@ public class LibraryTest {
         assertTrue(report.contains("The Catcher in the Rye borrowed by Alice"), "El reporte debería mostrar que 'The Catcher in the Rye' fue tomado prestado por Alice");
     }
 }
+

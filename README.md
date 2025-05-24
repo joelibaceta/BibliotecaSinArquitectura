@@ -1,4 +1,3 @@
-
 # Instrucciones para la actividad
 
 ## 🔧 Reestructuración del Proyecto: Ejercicio de Arquitectura Modular
@@ -60,3 +59,36 @@ Puedes entregar tu propuesta en formato visual:
 - Coherencia en el uso de capas o módulos
 - Entregables completos y bien justificados (diagrama y/o código).
 - Presentación ordenada y profesional.
+
+---
+
+# Arquitectura Modular Propuesta
+
+## 🏗️ Resumen de la arquitectura
+
+El proyecto ha sido refactorizado siguiendo una **arquitectura en capas** dentro de un monolito modular, separando las responsabilidades y facilitando la escalabilidad y el mantenimiento.
+
+### 📁 Estructura de carpetas
+
+```
+src/main/java/pe/tecsup/library/
+│
+├── model/
+│   ├── Book.java
+│   └── User.java
+│
+├── service/
+│   └── LibraryService.java
+│
+├── rules/
+│   ├── LoanRule.java
+│   ├── StudentLoanRule.java
+│   └── TeacherLoanRule.java
+│
+├── Main.java
+```
+
+### 🧩 Descripción de las capas
+- **model/**: Entidades principales del dominio (`Book`, `User`).
+- **rules/**: Reglas de negocio para préstamos, desacopladas mediante interfaces y clases concretas para cada tipo de usuario.
+- **service/**: Lógica de operaciones de préstamo, que utiliza las reglas definidas en la capa de `rules`.
