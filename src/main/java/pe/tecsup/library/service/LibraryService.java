@@ -1,89 +1,107 @@
-package pe.tecsup.library;
+package pe.tecsup.library.service;
+
+import pe.tecsup.library.model.Book;
+import pe.tecsup.library.model.User;
+import pe.tecsup.library.model.UserType;
+import pe.tecsup.library.rules.LoanRule;
+import pe.tecsup.library.rules.StudentLoanRule;
+import pe.tecsup.library.rules.TeacherLoanRule;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Library {
-    private List<Book> books;
-    private List<User> users;
+public class LibraryService {
+    private final List<Book> books;
+    private final List<User> users;
+    private final Map<UserType, LoanRule> loanRules;
 
-    public Library() {
+    public LibraryService() {
         this.books = new ArrayList<>();
         this.users = new ArrayList<>();
+        this.loanRules = new HashMap<>();
+        // Registrar reglas de préstamo
+        loanRules.put(UserType.STUDENT, new StudentLoanRule());
+        loanRules.put(UserType.TEACHER, new TeacherLoanRule());
     }
 
-    // Agregar un libro a la biblioteca
     public void addBook(Book book) {
+        if (book == null) throw new IllegalArgumentException("Libro no puede ser nulo");
+
         if (!books.contains(book)) {
             books.add(book);
         }
     }
 
-    // Remover un libro de la biblioteca
     public void removeBook(Book book) {
+        if (book == null) throw new IllegalArgumentException("Libro no puede ser nulo");
+
         books.remove(book);
     }
 
-    // Registrar un usuario en la biblioteca
     public void registerUser(User user) {
+        if (user == null) throw new IllegalArgumentException("Usuario no puede ser nulo");
+
         if (!users.contains(user)) {
             users.add(user);
         }
     }
 
-    // Permitir que un usuario tome un libro prestado
     public boolean borrowBook(User user, Book book) {
+        if (user == null || book == null) return false;
+
         if (books.contains(book)) {
-            if (user.getType().equals("Student") && user.getBorrowedBooks().size() < 2) {
-                user.borrowBook(book);
-                books.remove(book);
-                return true;
-            } else if (user.getType().equals("Teacher") && user.getBorrowedBooks().size() < 5) {
+            LoanRule rule = loanRules.get(user.getType());
+            if (rule != null && rule.canBorrow(user)) {
                 user.borrowBook(book);
                 books.remove(book);
                 return true;
             }
         }
+
         return false;
     }
 
-    // Permitir que un usuario devuelva un libro
     public void returnBook(User user, Book book) {
+        if (user == null || book == null) return;
+
         if (!books.contains(book)) {
             user.returnBook(book);
             books.add(book);
         }
     }
 
-    // Generar un reporte de la biblioteca
     public String generateReport() {
         StringBuilder report = new StringBuilder("Library Report\n");
         report.append("Available Books:\n");
+
         for (Book book : books) {
-            report.append(book.getTitle()).append("\n");
+            report.append(book.title()).append("\n");
         }
         report.append("\nBorrowed Books:\n");
+
         for (User user : users) {
             for (Book borrowedBook : user.getBorrowedBooks()) {
-                report.append(borrowedBook.getTitle()).append(" borrowed by ").append(user.getName()).append("\n");
+                report.append(borrowedBook.title()).append(" borrowed by ").append(user.getName()).append("\n");
             }
         }
+
         return report.toString();
     }
 
-    // Método para verificar si un libro está disponible en la biblioteca
     public boolean isBookAvailable(Book book) {
+        if (book == null) throw new IllegalArgumentException("Libro no puede ser nulo");
         return books.contains(book);
     }
 
-    // Obtener una lista inmutable de los libros
     public List<Book> getBooks() {
         return Collections.unmodifiableList(books);
     }
 
-    // Obtener una lista inmutable de los usuarios
     public List<User> getUsers() {
         return Collections.unmodifiableList(users);
     }
 }
+
